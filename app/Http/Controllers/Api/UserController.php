@@ -26,7 +26,7 @@ class UserController extends Controller
     {
         $users = User::all();
 
-        return response()->json( $users, 200);
+        return $this->successResponse( $users);
     }
 
     /**
