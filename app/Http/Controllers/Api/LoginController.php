@@ -11,6 +11,7 @@ class LoginController extends Controller
 {
     public function auth( Request $request)
     {
+        $tokenExp = $this->tokenExp( $request->isAdmin);
         $credentials = $request->only(['email', 'password']);
 
         Validator::make( $credentials, [
@@ -18,7 +19,7 @@ class LoginController extends Controller
             'password' => 'required|string'
         ])->validate();
 
-        if( !$token = Auth::guard('api')->attempt($credentials)) {
+        if( !$token = Auth::guard('api')->setTTL( $tokenExp)->attempt($credentials)) {
             $message = ['Unauthorized'];
             return response()->json( $message, 401);
         }
@@ -36,7 +37,7 @@ class LoginController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => Auth::guard('api')->factory()->getTTL() * 60
+            'expires_in' => Auth::guard('api')->factory()->getTTL()
         ]);
     }
 }

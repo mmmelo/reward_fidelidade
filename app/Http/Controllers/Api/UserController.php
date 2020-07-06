@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\User;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -39,10 +39,11 @@ class UserController extends Controller
     {
         $data = $request->all();
 
+        Validator::make($data, User::rules())->validate();
         try {
             $data['password'] = bcrypt( $data['password']);
             $user = $this->user->create($data);
-            return response()->json( ['created']);
+            return $this->successResponse($user);
         } catch ( \Exception $e) {
             return response()->json( [ 'error' => $e->getMessage()]);
         }
